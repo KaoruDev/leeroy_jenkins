@@ -1,0 +1,136 @@
+AllCops:
+  Exclude:
+    - 'db/**/*'
+    - Gemfile
+    - config/routes.rb
+  TargetRubyVersion: 2.2
+
+
+########################## Lint   ################################
+
+Lint/AssignmentInCondition:
+  Enabled: false
+
+Lint/EndAlignment:
+  AlignWith: variable
+
+Lint/HandleExceptions:
+  Enabled: false
+
+########################## Metrics ################################
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/ClassLength:
+  Enabled: false
+
+Metrics/MethodLength:
+  Enabled: false
+
+Metrics/ModuleLength:
+  Exclude:
+    - 'spec/**/*'
+
+########################## Styles ################################
+
+Style/AlignParameters:
+  Enabled: false
+
+Style/AlignHash:
+  Enabled: false
+
+Style/BlockDelimiters:
+  Enabled: false
+
+Style/ClosingParenthesisIndentation:
+  Enabled: false
+
+Style/CommentIndentation:
+  Enabled: false
+
+Style/CommentAnnotation:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Style/EmptyLinesAroundBlockBody:
+  Enabled: false
+
+Style/EmptyLinesAroundClassBody:
+  Enabled: false
+
+Style/EmptyLinesAroundModuleBody:
+  Enabled: false
+
+Style/EmptyLinesAroundMethodBody:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/IfUnlessModifier:
+  Enabled: false
+
+Style/IndentArray:
+  Enabled: false
+
+Style/Lambda:
+  Enabled: false
+
+Style/MultilineBlockChain:
+  Enabled: false
+
+Style/MultilineMethodCallIndentation:
+  EnforcedStyle: indented
+
+Style/MultilineOperationIndentation:
+  EnforcedStyle: indented
+
+Style/MutableConstant:
+  Enabled: false
+
+Style/Next:
+  Enabled: false
+
+Style/PredicateName:
+  NamePrefixBlacklist:
+    - is_
+    - have_
+
+Style/PercentLiteralDelimiters:
+  PreferredDelimiters:
+    '%':  '{}'
+    '%i': '{}'
+    '%q': '{}'
+    '%Q': '{}'
+    '%s': '{}'
+    '%w': '{}'
+    '%W': '{}'
+    '%x': '{}'
+
+Style/RegexpLiteral:
+  Enabled: false
+
+Style/SingleLineBlockParams:
+  Enabled: false
+
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+Style/StringLiteralsInInterpolation:
+  EnforcedStyle: double_quotes
+
+Style/TrailingCommaInArguments:
+  Enabled: false
+  # Gabe: maybe enforce trailing comma some day?
+  #EnforcedStyleForMultiline: comma
+
+Style/TrailingCommaInLiteral:
+  Enabled: false
+  # Gabe: maybe enforce trailing comma some day?
+  #EnforcedStyleForMultiline: comma
+
+Style/UnneededPercentQ:
+  Enabled: false
