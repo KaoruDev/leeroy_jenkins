@@ -4,7 +4,7 @@ module LeeroyJenkins
 
     def initialize(options = {})
       @disruptions = []
-      @options = {}
+      @options = options
     end
 
     def start
@@ -22,6 +22,8 @@ module LeeroyJenkins
         next_disrupton.run!
         disruptions << next_disrupton
       end
+
+      pause
     end
 
     def select_disruption

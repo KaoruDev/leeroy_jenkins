@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   Simulates hardware dedegration by connecting to boxes in your cluster and
   setting up iptables rules and [todo: figure out how to do i/o, cpu, memory].
   Leeroy Jenkins will also manage resetting any changes made.
-}.tr("\n")
+}.tr("\n", " ")
   s.authors     = ["Kaoru Kohashigawa"]
   s.email       = "dev@kaoruk.com"
   s.files       = `git ls-files bin lib *.md LICENSE`.split("\n")
