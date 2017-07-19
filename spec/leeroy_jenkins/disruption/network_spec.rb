@@ -13,11 +13,11 @@ module LeeroyJenkins
       let(:dependency_url) { "api.example.org" }
       let(:dependency_url_2) { "api2.example.org" }
       let(:dependencies) { [dependency_url, dependency_url_2] }
-      let(:chosen) { "web.example.org" }
+      let(:target) { "web.example.org" }
       let(:probability) { 0.76 }
 
       let(:victim) {
-        Victim.new(chosen: chosen, dependencies: dependencies)
+        Victim.new(target: target, dependencies: dependencies)
       }
 
       describe ".probability" do
@@ -59,7 +59,7 @@ module LeeroyJenkins
         end
 
         context "with a victim with no targets" do
-          let(:victim) { Victim.new(chosen: chosen) }
+          let(:victim) { Victim.new(target: target) }
 
           it "will drop a percentage of all outgoing / incoming packets" do
             expect(ssh_session).to receive(:exec!)
@@ -79,7 +79,7 @@ module LeeroyJenkins
             network = Network.new(victim, network_configs)
             network.run!
 
-            expect(ssh_session.host).to eq(victim.chosen)
+            expect(ssh_session.host).to eq(victim.target)
           end
         end
 
@@ -121,7 +121,7 @@ module LeeroyJenkins
             network = Network.new(victim, network_configs)
             network.run!
 
-            expect(ssh_session.host).to eq(victim.chosen)
+            expect(ssh_session.host).to eq(victim.target)
           end
         end
 
@@ -151,7 +151,7 @@ module LeeroyJenkins
 
             network.run!
 
-            expect(ssh_session.host).to eq(victim.chosen)
+            expect(ssh_session.host).to eq(victim.target)
           end
         end
       end

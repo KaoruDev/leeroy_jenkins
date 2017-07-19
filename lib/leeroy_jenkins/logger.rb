@@ -11,7 +11,7 @@ module LeeroyJenkins
       end
 
       def log(message)
-        write("[\e[30m#{NAME} INFO\e[0m]", message)
+        write("[\e[35m#{NAME} INFO\e[0m]", message)
       end
 
       def write(header, message)
@@ -36,4 +36,3 @@ module LeeroyJenkins
     end
   end
 end
-

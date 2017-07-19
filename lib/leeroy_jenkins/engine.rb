@@ -8,13 +8,11 @@ module LeeroyJenkins
     end
 
     def start
-      begin
-        loop do
-          run_iteration
-        end
-      ensure
-        close!
+      loop do
+        run_iteration
       end
+    ensure
+      close!
     end
 
     def run_iteration

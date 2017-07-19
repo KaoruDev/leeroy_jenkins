@@ -62,7 +62,7 @@ module LeeroyJenkins
       end
 
       def start_ssh_session
-        ssh.start(victim.chosen, whoami)
+        ssh.start(victim.target, whoami)
       end
 
       def ssh

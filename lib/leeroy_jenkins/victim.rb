@@ -6,14 +6,14 @@ module LeeroyJenkins
       @options = options
     end
 
-    def chosen
-      options[:chosen]
-      # TODO(Kaoru) if no host is chosen, pick one randomly from topology
+    def target
+      options[:target]
+      # TODO(Kaoru) if no host is target, pick one randomly from topology
     end
 
     def dependencies
       options[:dependencies] || []
-      # TODO(Kaoru) if no client is chosen,
+      # TODO(Kaoru) if no client is target,
       # pick one or non randomly from topology
     end
 
