@@ -18,11 +18,13 @@ Gem::Specification.new do |s|
   s.license     = "MIT"
   s.executables << "leeroy_jenkins.sh"
 
+  s.add_dependency "net-ssh", "~> 2.9"
 
   s.add_development_dependency "pry", "~> 0.10"
   s.add_development_dependency "rspec", "~> 3.5"
   s.add_development_dependency "guard", "~> 2.14"
   s.add_development_dependency "guard-rspec", "~> 4.7"
+  s.add_development_dependency "rubocop", "~> 0.48"
   s.add_development_dependency "fabrication", "~> 2.15"
 end
 
