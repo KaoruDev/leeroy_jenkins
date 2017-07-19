@@ -8,6 +8,7 @@ module LeeroyJenkins
           add_rule_chain
           add_dependency
           add_probability
+          add_target
         }
 
         attr_reader :configs
@@ -43,6 +44,10 @@ module LeeroyJenkins
           else
             rule
           end
+        end
+
+        def add_target(rule)
+          "#{rule} -J DROP"
         end
 
         def rule_chain
