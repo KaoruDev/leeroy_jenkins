@@ -57,7 +57,19 @@ module LeeroyJenkins
             is_expected.to contain_exactly("sudo iptables -A INPUT -J DROP")
           end
 
-          context "victim with specific dependencies" do
+          context "configured to simulate half open connections" do
+            subject { BuildRule.new(victim, half_open: true).input_rules }
+
+            it do
+              is_expected.to contain_exactly(
+                "sudo iptables -A INPUT " \
+                "-m conntrack --ctstate ESTABLISHED " \
+                "-J DROP"
+              )
+            end
+          end
+
+          context "with a victim with dependencies" do
             let(:victim) {
               Victim.new(dependencies: [dependency, dependency_2])
             }
@@ -67,6 +79,23 @@ module LeeroyJenkins
                 "sudo iptables -A INPUT --source #{dependency} -J DROP",
                 "sudo iptables -A INPUT --source #{dependency_2} -J DROP"
               )
+            end
+
+            context "with half_open" do
+              subject {
+                BuildRule.new(victim, half_open: true).input_rules
+              }
+
+              it "will contain two rules with conntrack" do
+                is_expected.to contain_exactly(
+                  "sudo iptables -A INPUT --source #{dependency} " \
+                  "-m conntrack --ctstate ESTABLISHED " \
+                  "-J DROP",
+                  "sudo iptables -A INPUT --source #{dependency_2} " \
+                  "-m conntrack --ctstate ESTABLISHED " \
+                  "-J DROP"
+                )
+              end
             end
 
             context "with probability" do

@@ -5,7 +5,7 @@ require_relative "./network/build_rule.rb"
 # will degrade network on a particular box
 #
 # cases:
-#   1) drop all packets on 80 and 443
+#   1) drop all packets except on port 22
 #   2) drop out ESTABLISHED going packets to foobar host (simulates half-close)
 #   3) drop all packets <> specific client
 #
@@ -26,8 +26,11 @@ module LeeroyJenkins
         ssh_session.exec!(reset_iptables_in(options[:duration]))
         ensure_ssh_connections_are_allowed
 
-        build_rules.output_rules.each do |rule|
-          ssh_session.exec!(rule)
+        # to simulate half open connects we drop only incoming packets
+        unless options[:half_open]
+          build_rules.output_rules.each do |rule|
+            ssh_session.exec!(rule)
+          end
         end
 
         build_rules.input_rules.each do |rule|
@@ -77,7 +80,8 @@ module LeeroyJenkins
       def build_rules
         @build_rule ||= BuildRule.new(
           victim,
-          probability: probability
+          probability: probability,
+          half_open: options[:half_open]
         )
       end
     end
