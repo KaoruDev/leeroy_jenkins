@@ -1,6 +1,6 @@
 module LeeroyJenkins
   class Logger
-    NAME = "LeeroyJenkins"
+    NAME = "LEEROY JENKINS"
     class << self
       def warn(message)
         write("[\e[33m#{NAME} WARN\e[0m]", message)

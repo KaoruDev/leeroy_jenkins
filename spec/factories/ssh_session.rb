@@ -1,23 +1,22 @@
 module Factories
   class SshSession
-    attr_reader :state, :list_of_commands, :host
+    attr_reader :state, :host
 
     def initialize
-      state = :opened
-      list_of_commands = []
+      self.state = :opened
     end
 
-    def start(target_host, whoami)
-      host = target_host
+    def start(target_host, _whoami)
+      self.host = target_host
       self
     end
 
-    def exec!(message)
+    def exec!(_message)
       raise "please stub me"
     end
 
     def close
-      state = :closed
+      self.state = :closed
     end
 
     private
