@@ -11,9 +11,7 @@ module LeeroyJenkins
 
         describe "#build" do
           it "will raise an error if input or output are not configured" do
-            rule = Rule.new
-
-            expect { rule.build }.to raise_error(RuntimeError)
+            expect { Rule.new.build }.to raise_error(RuntimeError)
           end
 
           context "as an output rule" do
@@ -111,8 +109,25 @@ module LeeroyJenkins
               end
             end
           end
-        end
 
+          context "simulating half open connections with a dependency" do
+            subject {
+              Rule.new(
+                input: true,
+                half_open: true,
+                dependency: dependency
+              ).build
+            }
+
+            it do
+              is_expected.to eq(
+                "sudo iptables -A INPUT --source #{dependency} " \
+                "-m conntrack --ctstate ESTABLISHED " \
+                "-J DROP"
+              )
+            end
+          end
+        end
       end
     end
   end

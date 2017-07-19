@@ -8,6 +8,7 @@ module LeeroyJenkins
           add_rule_chain
           add_dependency
           add_probability
+          add_state
           add_target
         }
 
@@ -41,6 +42,14 @@ module LeeroyJenkins
         def add_probability(rule)
           if probability = configs[:probability]
             "#{rule} -m statistic --mode random --probability #{probability}"
+          else
+            rule
+          end
+        end
+
+        def add_state(rule)
+          if configs[:half_open]
+            "#{rule} -m conntrack --ctstate ESTABLISHED"
           else
             rule
           end
