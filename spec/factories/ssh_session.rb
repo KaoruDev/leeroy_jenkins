@@ -12,7 +12,7 @@ module Factories
     end
 
     def exec!(_message)
-      raise "please stub me"
+      raise "Please override me!"
     end
 
     def close

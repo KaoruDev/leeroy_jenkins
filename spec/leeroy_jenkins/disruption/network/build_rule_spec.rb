@@ -15,7 +15,7 @@ module LeeroyJenkins
           subject { BuildRule.new(victim).output_rules }
 
           it "will output 1 rule without a destination" do
-            is_expected.to contain_exactly("sudo iptables -A OUTPUT -J DROP")
+            is_expected.to contain_exactly("sudo iptables -A OUTPUT -j DROP")
           end
 
           context "victim with specific dependencies" do
@@ -25,8 +25,8 @@ module LeeroyJenkins
 
             it "will contain two rules with each dependency" do
               is_expected.to contain_exactly(
-                "sudo iptables -A OUTPUT --destination #{dependency} -J DROP",
-                "sudo iptables -A OUTPUT --destination #{dependency_2} -J DROP"
+                "sudo iptables -A OUTPUT --destination #{dependency} -j DROP",
+                "sudo iptables -A OUTPUT --destination #{dependency_2} -j DROP"
               )
             end
 
@@ -39,10 +39,10 @@ module LeeroyJenkins
                 is_expected.to contain_exactly(
                   "sudo iptables -A OUTPUT --destination #{dependency} " \
                   "-m statistic --mode random --probability #{probability} " \
-                  "-J DROP",
+                  "-j DROP",
                   "sudo iptables -A OUTPUT --destination #{dependency_2} " \
                   "-m statistic --mode random --probability #{probability} " \
-                  "-J DROP"
+                  "-j DROP"
                 )
               end
             end
@@ -54,7 +54,7 @@ module LeeroyJenkins
           subject { BuildRule.new(victim).input_rules }
 
           it "will output 1 rule without a source" do
-            is_expected.to contain_exactly("sudo iptables -A INPUT -J DROP")
+            is_expected.to contain_exactly("sudo iptables -A INPUT -j DROP")
           end
 
           context "configured to simulate half open connections" do
@@ -64,7 +64,7 @@ module LeeroyJenkins
               is_expected.to contain_exactly(
                 "sudo iptables -A INPUT " \
                 "-m conntrack --ctstate ESTABLISHED " \
-                "-J DROP"
+                "-j DROP"
               )
             end
           end
@@ -76,8 +76,8 @@ module LeeroyJenkins
 
             it "will contain two rules with each dependency" do
               is_expected.to contain_exactly(
-                "sudo iptables -A INPUT --source #{dependency} -J DROP",
-                "sudo iptables -A INPUT --source #{dependency_2} -J DROP"
+                "sudo iptables -A INPUT --source #{dependency} -j DROP",
+                "sudo iptables -A INPUT --source #{dependency_2} -j DROP"
               )
             end
 
@@ -90,10 +90,10 @@ module LeeroyJenkins
                 is_expected.to contain_exactly(
                   "sudo iptables -A INPUT --source #{dependency} " \
                   "-m conntrack --ctstate ESTABLISHED " \
-                  "-J DROP",
+                  "-j DROP",
                   "sudo iptables -A INPUT --source #{dependency_2} " \
                   "-m conntrack --ctstate ESTABLISHED " \
-                  "-J DROP"
+                  "-j DROP"
                 )
               end
             end
@@ -107,10 +107,10 @@ module LeeroyJenkins
                 is_expected.to contain_exactly(
                   "sudo iptables -A INPUT --source #{dependency} " \
                   "-m statistic --mode random --probability #{probability} " \
-                  "-J DROP",
+                  "-j DROP",
                   "sudo iptables -A INPUT --source #{dependency_2} " \
                   "-m statistic --mode random --probability #{probability} " \
-                  "-J DROP"
+                  "-j DROP"
                 )
               end
             end

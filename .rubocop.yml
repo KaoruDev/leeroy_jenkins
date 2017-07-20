@@ -25,6 +25,7 @@ Metrics/AbcSize:
 Metrics/BlockLength:
   Exclude:
     - 'spec/**/*'
+    - 'bin/*'
 
 Metrics/ClassLength:
   Enabled: false
@@ -36,6 +37,7 @@ Metrics/MethodLength:
 Metrics/ModuleLength:
   Exclude:
     - 'spec/**/*'
+    - 'bin/*'
 
 ########################## Styles ################################
 

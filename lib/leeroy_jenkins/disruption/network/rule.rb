@@ -56,7 +56,7 @@ module LeeroyJenkins
         end
 
         def add_target(rule)
-          "#{rule} -J DROP"
+          "#{rule} -j DROP"
         end
 
         def rule_chain

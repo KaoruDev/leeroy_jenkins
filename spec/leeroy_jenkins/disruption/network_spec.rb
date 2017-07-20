@@ -8,7 +8,7 @@ module LeeroyJenkins
     RSpec.describe Network do
       let(:ssh_session) { Factories::SshSession.new }
       let(:network_configs) {
-        { ssh: ssh_session, probability: probability }
+        { ssh: ssh_session, probability: probability, for_reals: true }
       }
       let(:dependency_url) { "api.example.org" }
       let(:dependency_url_2) { "api2.example.org" }
@@ -41,19 +41,25 @@ module LeeroyJenkins
       describe ".run!" do
         before do
           expect(ssh_session).to receive(:exec!)
-            .with("echo 'sudo service iptables restart' " \
+            .with("sudo iptables-save > ~/default_iptables.rules")
+            .ordered
+            .once
+
+          expect(ssh_session).to receive(:exec!)
+            .with("echo 'cat ~/default_iptables.rules | " \
+                  "sudo iptables-restore' " \
                   "| at now + 60 minutes")
             .ordered
             .once
 
           # accepts all ssh connections
           expect(ssh_session).to receive(:exec!)
-            .with("sudo iptables -A INPUT -p 22 -J ACCEPT")
+            .with("sudo iptables -A INPUT -p 22 -j ACCEPT")
             .ordered
             .once
 
           expect(ssh_session).to receive(:exec!)
-            .with("sudo iptables -A OUTPUT --sport 22 -J ACCEPT")
+            .with("sudo iptables -A OUTPUT --sport 22 -j ACCEPT")
             .ordered
             .once
         end
@@ -65,14 +71,14 @@ module LeeroyJenkins
             expect(ssh_session).to receive(:exec!)
               .with("sudo iptables -A OUTPUT " \
                     "-m statistic --mode random --probability #{probability} " \
-                    "-J DROP")
+                    "-j DROP")
               .ordered
               .once
 
             expect(ssh_session).to receive(:exec!)
               .with("sudo iptables -A INPUT " \
                     "-m statistic --mode random --probability #{probability} " \
-                    "-J DROP")
+                    "-j DROP")
               .ordered
               .once
 
@@ -90,7 +96,7 @@ module LeeroyJenkins
               .with("sudo iptables -A OUTPUT " \
                     "--destination #{dependency_url} " \
                     "-m statistic --mode random --probability #{probability} " \
-                    "-J DROP")
+                    "-j DROP")
               .ordered
               .once
 
@@ -98,7 +104,7 @@ module LeeroyJenkins
               .with("sudo iptables -A OUTPUT " \
                     "--destination #{dependency_url_2} " \
                     "-m statistic --mode random --probability #{probability} " \
-                    "-J DROP")
+                    "-j DROP")
               .ordered
               .once
 
@@ -107,14 +113,14 @@ module LeeroyJenkins
               .with("sudo iptables -A INPUT " \
                     "--source #{dependency_url} " \
                     "-m statistic --mode random --probability #{probability} " \
-                    "-J DROP")
+                    "-j DROP")
               .ordered
 
             expect(ssh_session).to receive(:exec!)
               .with("sudo iptables -A INPUT " \
                     "--source #{dependency_url_2} " \
                     "-m statistic --mode random --probability #{probability} " \
-                    "-J DROP")
+                    "-j DROP")
               .ordered
               .once
 
@@ -132,7 +138,7 @@ module LeeroyJenkins
                     "--source #{dependency_url} " \
                     "-m statistic --mode random --probability #{probability} " \
                     "-m conntrack --ctstate ESTABLISHED " \
-                    "-J DROP")
+                    "-j DROP")
               .ordered
 
             expect(ssh_session).to receive(:exec!)
@@ -140,7 +146,7 @@ module LeeroyJenkins
                     "--source #{dependency_url_2} " \
                     "-m statistic --mode random --probability #{probability} " \
                     "-m conntrack --ctstate ESTABLISHED " \
-                    "-J DROP")
+                    "-j DROP")
               .ordered
               .once
 

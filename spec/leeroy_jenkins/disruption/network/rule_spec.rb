@@ -17,7 +17,7 @@ module LeeroyJenkins
           context "as an output rule" do
             subject { Rule.new(output: true).build }
 
-            it { is_expected.to eq("sudo iptables -A OUTPUT -J DROP") }
+            it { is_expected.to eq("sudo iptables -A OUTPUT -j DROP") }
 
             context "with a configured probability" do
               subject {
@@ -28,7 +28,7 @@ module LeeroyJenkins
                 is_expected.to eq(
                   "sudo iptables -A OUTPUT " \
                   "-m statistic --mode random --probability #{probability} " \
-                  "-J DROP"
+                  "-j DROP"
                 )
               end
             end
@@ -38,7 +38,7 @@ module LeeroyJenkins
 
               it do
                 is_expected.to eq(
-                  "sudo iptables -A OUTPUT --destination #{dependency} -J DROP"
+                  "sudo iptables -A OUTPUT --destination #{dependency} -j DROP"
                 )
               end
 
@@ -56,7 +56,7 @@ module LeeroyJenkins
                     "sudo iptables -A OUTPUT " \
                     "--destination #{dependency} " \
                     "-m statistic --mode random --probability #{probability} " \
-                    "-J DROP"
+                    "-j DROP"
                   )
                 end
               end
@@ -66,7 +66,7 @@ module LeeroyJenkins
           context "as an input rule" do
             subject { Rule.new(input: true).build }
 
-            it { is_expected.to eq("sudo iptables -A INPUT -J DROP") }
+            it { is_expected.to eq("sudo iptables -A INPUT -j DROP") }
 
             context "with a configured probability" do
               subject { Rule.new(input: true, probability: probability).build }
@@ -75,7 +75,7 @@ module LeeroyJenkins
                 is_expected.to eq(
                   "sudo iptables -A INPUT " \
                   "-m statistic --mode random --probability #{probability} " \
-                  "-J DROP"
+                  "-j DROP"
                 )
               end
             end
@@ -85,7 +85,7 @@ module LeeroyJenkins
 
               it do
                 is_expected.to eq(
-                  "sudo iptables -A OUTPUT --destination #{dependency} -J DROP"
+                  "sudo iptables -A OUTPUT --destination #{dependency} -j DROP"
                 )
               end
 
@@ -103,7 +103,7 @@ module LeeroyJenkins
                     "sudo iptables -A OUTPUT " \
                     "--destination #{dependency} " \
                     "-m statistic --mode random --probability #{probability} " \
-                    "-J DROP"
+                    "-j DROP"
                   )
                 end
               end
@@ -123,7 +123,7 @@ module LeeroyJenkins
               is_expected.to eq(
                 "sudo iptables -A INPUT --source #{dependency} " \
                 "-m conntrack --ctstate ESTABLISHED " \
-                "-J DROP"
+                "-j DROP"
               )
             end
           end

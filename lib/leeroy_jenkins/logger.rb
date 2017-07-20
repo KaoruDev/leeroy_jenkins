@@ -1,3 +1,5 @@
+require_relative "./env"
+
 module LeeroyJenkins
   class Logger
     NAME = "LEEROY JENKINS"
@@ -11,7 +13,7 @@ module LeeroyJenkins
       end
 
       def log(message)
-        write("[\e[35m#{NAME} INFO\e[0m]", message)
+        write("[\e[36m#{NAME} INFO\e[0m]", message)
       end
 
       def write(header, message)
