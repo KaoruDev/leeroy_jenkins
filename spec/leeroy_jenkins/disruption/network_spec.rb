@@ -52,6 +52,12 @@ module LeeroyJenkins
             .ordered
             .once
 
+          expect(ssh_session).to receive(:exec!)
+            .with("echo 'rm ~/default_iptables.rules' " \
+                  "| at now + 61 minutes")
+            .ordered
+            .once
+
           # accepts all ssh connections
           expect(ssh_session).to receive(:exec!)
             .with("sudo iptables -A INPUT -p 22 -j ACCEPT")

@@ -22,7 +22,7 @@ module LeeroyJenkins
       validate!
       network.run!
     ensure
-      network.close!
+      network.close_without_reseting
     end
 
     private

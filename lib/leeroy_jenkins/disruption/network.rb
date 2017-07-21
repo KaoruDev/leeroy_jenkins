@@ -55,8 +55,15 @@ module LeeroyJenkins
         log_encourage_message
       end
 
+      def close_without_reseting
+        ssh_session.close
+      rescue IOException
+        Logger.warn("ssh session already closed!")
+      end
+
       def close!
-        ssh_exec!("sudo service iptables restart")
+        ssh_exec!(reset_rules_command)
+        ssh_exec!("rm ~/#{DEFAULT_RULES_FILE}")
         ssh_session.close
       rescue IOException
         Logger.warn("ssh session already closed!")
@@ -74,9 +81,14 @@ module LeeroyJenkins
       end
 
       def queue_reset_rules
-        ssh_exec!("echo 'cat ~/#{DEFAULT_RULES_FILE} | " \
-                  "sudo iptables-restore' " \
+        ssh_exec!("echo '#{reset_rules_command}' " \
                   "| at now + #{duration} minutes")
+        ssh_exec!("echo 'rm ~/#{DEFAULT_RULES_FILE}' " \
+                  "| at now + #{duration + 1} minutes")
+      end
+
+      def reset_rules_command
+        "cat ~/#{DEFAULT_RULES_FILE} | sudo iptables-restore"
       end
 
       def ssh_exec!(command)
