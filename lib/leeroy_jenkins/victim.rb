@@ -9,10 +9,10 @@ module LeeroyJenkins
     end
 
     def target
-      unless options[:target]
-        raise Error, "Please specify a target"
+      options[:target].tap do |assigned_target|
+        raise Error, "Please specify a target" if assigned_target.nil?
+        # TODO(Kaoru) if no host is target, pick one randomly from topology
       end
-      # TODO(Kaoru) if no host is target, pick one randomly from topology
     end
 
     def dependencies

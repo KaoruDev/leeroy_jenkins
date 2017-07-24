@@ -20,7 +20,7 @@ module LeeroyJenkins
     def run
       network.run!
     ensure
-      network.close_without_reseting
+      network.close
     end
 
     private

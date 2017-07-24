@@ -1,15 +1,14 @@
-require_relative "../logger.rb"
+require_relative "./logger.rb"
 
 require "net/ssh"
 
 module LeeroyJenkins
   class SshSession
 
-    attr_reader :victim
+    attr_reader :victim, :for_reals
 
     def initialize(victim, options = {})
       @victim = victim
-      @opened = false
       @for_reals = options[:for_reals]
     end
 
@@ -31,8 +30,11 @@ module LeeroyJenkins
       end
     end
 
-    def close!
-      connection.close! if @opened
+    def close
+      if for_reals
+        connection.close
+        Logger.log("Successfully disconnected from #{victim.target}")
+      end
     end
 
     private

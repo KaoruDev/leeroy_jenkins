@@ -1,5 +1,6 @@
 require_relative "../logger.rb"
 require_relative "../victim.rb"
+require_relative "../ssh_session.rb"
 require_relative "./network/build_rule.rb"
 require_relative "../../../spec/factories/ssh_session"
 
@@ -54,18 +55,14 @@ module LeeroyJenkins
         ssh.exec_commands(*commands)
       end
 
-      def close_without_reseting
-        ssh_session.close
-      rescue IOException
-        Logger.warn("ssh session already closed!")
-      end
-
-      def close!
+      def clean_up
         ssh.exec!(reset_rules_command)
         ssh.exec!("rm ~/#{DEFAULT_RULES_FILE}")
-        ssh.close!
-      rescue IOException
-        Logger.warn("ssh session already closed!")
+        close
+      end
+
+      def close
+        ssh.close
       end
 
       private

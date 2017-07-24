@@ -2,7 +2,8 @@ require_relative "./env"
 
 module LeeroyJenkins
   class Logger
-    NAME = "LEEROY JENKINS"
+    NAME = "LJ"
+
     class << self
       def warn(message)
         write("[\e[33m#{NAME} WARN\e[0m]", message)
