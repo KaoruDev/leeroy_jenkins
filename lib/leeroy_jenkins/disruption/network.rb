@@ -20,7 +20,7 @@ module LeeroyJenkins
     class Network
       DEFAULT_RULES_FILE = "default_iptables.rules"
 
-      attr_accessor :victim, :duration, :half_open, :for_reals
+      attr_accessor :victim, :duration, :half_open, :for_reals, :ssh
 
       def initialize(victim, options = {})
         # TODO: I should change how we use options, it's easier to read if i
@@ -35,24 +35,23 @@ module LeeroyJenkins
       end
 
       def run!
-        log_dry_run_message
-
-        save_default_rules
-        queue_reset_rules
-        ensure_ssh_connections_are_allowed
+        commands = [
+          "sudo iptables-save > ~/#{DEFAULT_RULES_FILE}",
+          "echo '#{reset_rules_command}' | at now + #{duration} minutes",
+          "echo 'rm ~/#{DEFAULT_RULES_FILE}' | " \
+            "at now + #{duration + 1} minutes",
+          "sudo iptables -A INPUT -p 22 -j ACCEPT",
+          "sudo iptables -A OUTPUT --sport 22 -j ACCEPT",
+        ]
 
         # to simulate half open connects we drop only incoming packets
         unless half_open
-          build_rules.output_rules.each do |rule|
-            ssh_exec!(rule)
-          end
+          commands.concat(build_rules.output_rules)
         end
 
-        build_rules.input_rules.each do |rule|
-          ssh_exec!(rule)
-        end
+        commands.concat(build_rules.input_rules)
 
-        log_encourage_message
+        ssh.exec_commands(*commands)
       end
 
       def close_without_reseting
@@ -62,64 +61,21 @@ module LeeroyJenkins
       end
 
       def close!
-        ssh_exec!(reset_rules_command)
-        ssh_exec!("rm ~/#{DEFAULT_RULES_FILE}")
-        ssh_session.close
+        ssh.exec!(reset_rules_command)
+        ssh.exec!("rm ~/#{DEFAULT_RULES_FILE}")
+        ssh.close!
       rescue IOException
         Logger.warn("ssh session already closed!")
       end
 
       private
 
-      def ensure_ssh_connections_are_allowed
-        ssh_exec!("sudo iptables -A INPUT -p 22 -j ACCEPT")
-        ssh_exec!("sudo iptables -A OUTPUT --sport 22 -j ACCEPT")
-      end
-
-      def save_default_rules
-        ssh_exec!("sudo iptables-save > ~/#{DEFAULT_RULES_FILE}")
-      end
-
-      def queue_reset_rules
-        ssh_exec!("echo '#{reset_rules_command}' " \
-                  "| at now + #{duration} minutes")
-        ssh_exec!("echo 'rm ~/#{DEFAULT_RULES_FILE}' " \
-                  "| at now + #{duration + 1} minutes")
-      end
-
       def reset_rules_command
         "cat ~/#{DEFAULT_RULES_FILE} | sudo iptables-restore"
       end
 
-      def ssh_exec!(command)
-        if for_reals
-          Logger.log("[TARGET: #{victim.target}] Running #{command}")
-          # TODO(Kaoru): Log the results in verbose mode
-          ssh_session.exec!(command)
-        else
-          Logger.log(command)
-        end
-      end
-
-      def ssh_session
-        return @ssh_session if @ssh_session
-
-        Logger.log("Establishing ssh connection with #{victim.target}")
-        @ssh_session = ssh.start(victim.target, whoami).tap do
-          Logger.log("ssh successfully connected! #{victim.target}")
-        end
-      end
-
-      def ssh
-        @ssh ||= Net::SSH
-      end
-
       def probability
         @probability || rand(0.75...0.95)
-      end
-
-      def whoami
-        `whoami`.chomp
       end
 
       def build_rules
@@ -130,23 +86,8 @@ module LeeroyJenkins
         )
       end
 
-      def log_dry_run_message
-        if for_reals
-          Logger.log("\e[31mOk running these commands on" \
-                    " #{victim.target} for reals!\e[0m")
-        else
-          Logger.log("I'll run these commands on #{victim.target} " \
-                     "when you pass in the \e[31m--for_reals\e[0m flag. ")
-        end
-
-        Logger.log("===========================================")
-      end
-
-      def log_encourage_message
-        unless for_reals
-          Logger.log("Come on already! Pass the \e[31m--for_reals \e[0mflag" \
-                      " and let me play!!!!")
-        end
+      def ssh
+        @ssh ||= SshSession.new(victim, for_reals: for_reals)
       end
     end
   end

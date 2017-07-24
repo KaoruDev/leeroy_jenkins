@@ -1,27 +1,21 @@
 module Factories
   class SshSession
-    attr_reader :state, :host
+    attr_reader :victim
 
-    def initialize
-      self.state = :opened
+    def initialize(victim, _options = {})
+      @victim = victim
     end
 
-    def start(target_host, _whoami)
-      self.host = target_host
-      self
+    def exec_commands(*_commands)
+      raise "Please stub me!"
     end
 
-    def exec!(_message)
-      raise "Please override me!"
+    def exec!(_command)
+      raise "Please stub me!"
     end
 
-    def close
-      self.state = :closed
+    def close!
+      raise "please stub me!"
     end
-
-    private
-
-    attr_writer :state, :host
-
   end
 end

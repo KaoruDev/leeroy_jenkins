@@ -1,4 +1,3 @@
-require_relative "./errors"
 require_relative "./victim"
 require_relative "./disruption/network"
 
@@ -19,7 +18,6 @@ module LeeroyJenkins
     end
 
     def run
-      validate!
       network.run!
     ensure
       network.close_without_reseting
@@ -42,13 +40,6 @@ module LeeroyJenkins
         half_open: options[:half_open],
         for_reals: options[:for_reals]
       )
-    end
-
-    def validate!
-      # TODO: once network topology is in we can remove this check
-      unless options[:target]
-        raise CommandLineError, "Must assign a target value"
-      end
     end
   end
 end

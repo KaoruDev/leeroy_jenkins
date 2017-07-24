@@ -6,7 +6,7 @@ require "lib/leeroy_jenkins/disruption/network"
 module LeeroyJenkins
   class Disruption
     RSpec.describe Network do
-      let(:ssh_session) { Factories::SshSession.new }
+      let(:ssh_session) { Factories::SshSession.new(victim) }
       let(:network_configs) {
         { ssh: ssh_session, probability: probability, for_reals: true }
       }
@@ -39,122 +39,119 @@ module LeeroyJenkins
       end
 
       describe ".run!" do
-        before do
-          expect(ssh_session).to receive(:exec!)
-            .with("sudo iptables-save > ~/default_iptables.rules")
-            .ordered
-            .once
-
-          expect(ssh_session).to receive(:exec!)
-            .with("echo 'cat ~/default_iptables.rules | " \
-                  "sudo iptables-restore' " \
-                  "| at now + 60 minutes")
-            .ordered
-            .once
-
-          expect(ssh_session).to receive(:exec!)
-            .with("echo 'rm ~/default_iptables.rules' " \
-                  "| at now + 61 minutes")
-            .ordered
-            .once
-
-          # accepts all ssh connections
-          expect(ssh_session).to receive(:exec!)
-            .with("sudo iptables -A INPUT -p 22 -j ACCEPT")
-            .ordered
-            .once
-
-          expect(ssh_session).to receive(:exec!)
-            .with("sudo iptables -A OUTPUT --sport 22 -j ACCEPT")
-            .ordered
-            .once
-        end
+        let(:commands) {
+          [
+            "sudo iptables-save > ~/default_iptables.rules",
+            "echo 'cat ~/default_iptables.rules | sudo iptables-restore' " \
+                  "| at now + 60 minutes",
+            "echo 'rm ~/default_iptables.rules' | at now + 61 minutes",
+            "sudo iptables -A INPUT -p 22 -j ACCEPT",
+            "sudo iptables -A OUTPUT --sport 22 -j ACCEPT",
+          ]
+        }
 
         context "with a victim with no targets" do
           let(:victim) { Victim.new(target: target) }
 
           it "will drop a percentage of all outgoing / incoming packets" do
-            expect(ssh_session).to receive(:exec!)
-              .with("sudo iptables -A OUTPUT " \
-                    "-m statistic --mode random --probability #{probability} " \
-                    "-j DROP")
-              .ordered
-              .once
+            expected_commands = commands.dup
+            received_commands = nil
 
-            expect(ssh_session).to receive(:exec!)
-              .with("sudo iptables -A INPUT " \
-                    "-m statistic --mode random --probability #{probability} " \
-                    "-j DROP")
-              .ordered
-              .once
+            expected_commands.push(
+              "sudo iptables -A OUTPUT " \
+                "-m statistic --mode random --probability #{probability} " \
+                "-j DROP"
+            )
+
+            expected_commands.push(
+              "sudo iptables -A INPUT " \
+                "-m statistic --mode random --probability #{probability} " \
+                "-j DROP"
+            )
+
+            expect(ssh_session).to receive(:exec_commands) { |*args|
+              received_commands = args
+            }
 
             network = Network.new(victim, network_configs)
             network.run!
 
-            expect(ssh_session.host).to eq(victim.target)
+            # Order of commands matter
+            expect(expected_commands).to eq(received_commands)
           end
         end
 
         context "with a victim with 2 dependencies" do
           it "will drop a percentage of out going and incoming " \
              "packets to clients " do
-            expect(ssh_session).to receive(:exec!)
-              .with("sudo iptables -A OUTPUT " \
-                    "--destination #{dependency_url} " \
-                    "-m statistic --mode random --probability #{probability} " \
-                    "-j DROP")
-              .ordered
-              .once
+            expected_commands = commands.dup
+            received_commands = nil
 
-            expect(ssh_session).to receive(:exec!)
-              .with("sudo iptables -A OUTPUT " \
-                    "--destination #{dependency_url_2} " \
-                    "-m statistic --mode random --probability #{probability} " \
-                    "-j DROP")
-              .ordered
-              .once
+            expected_commands.push(
+              "sudo iptables -A OUTPUT " \
+                "--destination #{dependency_url} " \
+                "-m statistic --mode random --probability #{probability} " \
+                "-j DROP"
+            )
+
+            expected_commands.push(
+              "sudo iptables -A OUTPUT " \
+                "--destination #{dependency_url_2} " \
+                "-m statistic --mode random --probability #{probability} " \
+                "-j DROP"
+            )
 
             # drops packets outgoing to client
-            expect(ssh_session).to receive(:exec!)
-              .with("sudo iptables -A INPUT " \
-                    "--source #{dependency_url} " \
-                    "-m statistic --mode random --probability #{probability} " \
-                    "-j DROP")
-              .ordered
+            expected_commands.push(
+              "sudo iptables -A INPUT " \
+                "--source #{dependency_url} " \
+                "-m statistic --mode random --probability #{probability} " \
+                "-j DROP"
+            )
 
-            expect(ssh_session).to receive(:exec!)
-              .with("sudo iptables -A INPUT " \
-                    "--source #{dependency_url_2} " \
-                    "-m statistic --mode random --probability #{probability} " \
-                    "-j DROP")
-              .ordered
-              .once
+            expected_commands.push(
+              "sudo iptables -A INPUT " \
+                "--source #{dependency_url_2} " \
+                "-m statistic --mode random --probability #{probability} " \
+                "-j DROP"
+            )
+
+            expect(ssh_session).to receive(:exec_commands) { |*args|
+              received_commands = args
+            }.once
 
             network = Network.new(victim, network_configs)
             network.run!
 
-            expect(ssh_session.host).to eq(victim.target)
+            # Order of commands matter
+            expect(expected_commands).to eq(received_commands)
           end
         end
 
         context "with half open connectons" do
           it "will drop a percentage of ESTALISHED packets" do
-            expect(ssh_session).to receive(:exec!)
-              .with("sudo iptables -A INPUT " \
-                    "--source #{dependency_url} " \
-                    "-m statistic --mode random --probability #{probability} " \
-                    "-m conntrack --ctstate ESTABLISHED " \
-                    "-j DROP")
-              .ordered
+            received_commands = nil
+            expected_commands = commands.dup
 
-            expect(ssh_session).to receive(:exec!)
-              .with("sudo iptables -A INPUT " \
-                    "--source #{dependency_url_2} " \
-                    "-m statistic --mode random --probability #{probability} " \
-                    "-m conntrack --ctstate ESTABLISHED " \
-                    "-j DROP")
-              .ordered
-              .once
+            expected_commands.push(
+              "sudo iptables -A INPUT " \
+                "--source #{dependency_url} " \
+                "-m statistic --mode random --probability #{probability} " \
+                "-m conntrack --ctstate ESTABLISHED " \
+                "-j DROP"
+            )
+
+            expected_commands.push(
+              "sudo iptables -A INPUT " \
+                "--source #{dependency_url_2} " \
+                "-m statistic --mode random --probability #{probability} " \
+                "-m conntrack --ctstate ESTABLISHED " \
+                "-j DROP"
+            )
+
+            expect(ssh_session).to receive(:exec_commands) { |*args|
+              received_commands = args
+            }.once
 
             network = Network.new(
               victim,
@@ -163,7 +160,8 @@ module LeeroyJenkins
 
             network.run!
 
-            expect(ssh_session.host).to eq(victim.target)
+            # Order of commands matter
+            expect(expected_commands).to eq(received_commands)
           end
         end
       end
