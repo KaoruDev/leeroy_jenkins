@@ -13,8 +13,7 @@ module LeeroyJenkins
             --for_reals
           })
 
-          configs = parser.parse
-          expect(configs).to eq(duration: 5, for_reals: true)
+          expect(parser.parse).to eq(duration: 5, for_reals: true)
         end
 
         it "will exit the program if an invalid argument is passed" do

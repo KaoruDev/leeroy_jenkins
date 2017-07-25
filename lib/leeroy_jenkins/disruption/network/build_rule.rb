@@ -26,7 +26,7 @@ module LeeroyJenkins
 
         def build_rules(configs = {})
           if victim.all?
-            [ Rule.new(build_rule_configs(nil, configs)).build ]
+            [Rule.new(build_rule_configs(nil, configs)).build]
           else
             victim.dependencies.map do |dependency|
               Rule.new(build_rule_configs(dependency, configs)).build
