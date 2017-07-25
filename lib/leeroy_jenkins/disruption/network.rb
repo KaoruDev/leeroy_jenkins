@@ -2,7 +2,6 @@ require_relative "../logger.rb"
 require_relative "../victim.rb"
 require_relative "../ssh_session.rb"
 require_relative "./network/build_rule.rb"
-require_relative "../../../spec/factories/ssh_session"
 
 require "net/ssh"
 
@@ -20,8 +19,16 @@ module LeeroyJenkins
   class Disruption
     class Network
       DEFAULT_RULES_FILE = "default_iptables.rules"
+      DEFAULT_DURATION = 60
+      RESET_RULES_COMMAND =
+        "cat ~/#{DEFAULT_RULES_FILE} | sudo iptables-restore"
 
       attr_accessor :victim, :duration, :half_open, :for_reals, :ssh
+
+      def self.run_from_command_line(arguments)
+        parser = CommandLineParser.new(arguments)
+        new(victim, parser.options)
+      end
 
       def initialize(victim, options = {})
         # TODO: I should change how we use options, it's easier to read if i
@@ -30,7 +37,7 @@ module LeeroyJenkins
         @ssh = options[:ssh]
         @probability = options[:probability]
         @half_open = options[:half_open] || false
-        @duration = options[:duration] || 60
+        @duration = options[:duration] || DEFAULT_DURATION
         @victim = victim
         @for_reals = options[:for_reals]
       end
@@ -68,7 +75,7 @@ module LeeroyJenkins
       private
 
       def reset_rules_command
-        "cat ~/#{DEFAULT_RULES_FILE} | sudo iptables-restore"
+        RESET_RULES_COMMAND
       end
 
       def probability

@@ -1,5 +1,5 @@
-require_relative "./victim"
 require_relative "./disruption/network"
+require_relative "./version"
 
 module LeeroyJenkins
   class CommandLineRunner
@@ -11,35 +11,22 @@ module LeeroyJenkins
     # 3) A lot of what exists in here should belong in Network's command line
     #    parser
 
-    attr_reader :options
+    VALID_COMMANDS = %w{
+      network
+      fire_drill
+    }
 
-    def initialize(options = {})
-      @options = options
-    end
+    VERSION_FLAG = "--version"
 
     def run
-      network.run!
-    ensure
-      network.close
+      if ARGV.any? { |arg| arg == VERSION_FLAG }
+        Logger.info(VERSION)
+      else
+        ARGV.find { |arg| VALID_COMMANDS.include?(arg) }.tap do |command|
+          CommandLineArgumentParser.print_help if command.nil?
+        end
+      end
     end
 
-    private
-
-    def victim
-      Victim.new(
-        target: options[:target],
-        dependencies: options[:dependencies]
-      )
-    end
-
-    def network
-      Disruption::Network.new(
-        victim,
-        probability: options[:probability],
-        duration: options[:duration],
-        half_open: options[:half_open],
-        for_reals: options[:for_reals]
-      )
-    end
   end
 end

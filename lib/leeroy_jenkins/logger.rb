@@ -13,7 +13,7 @@ module LeeroyJenkins
         write("[\e[31m#{NAME} ERROR\e[0m]", message)
       end
 
-      def log(message)
+      def info(message)
         write("[\e[36m#{NAME} INFO\e[0m]", message)
       end
 
