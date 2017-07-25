@@ -6,7 +6,7 @@ require "lib/leeroy_jenkins/disruption/network"
 module LeeroyJenkins
   class Disruption
     RSpec.describe Network do
-      let(:ssh_session) { Factories::SshSession.new(victim) }
+      let(:ssh_session) { double("ssh_session") }
       let(:network_configs) {
         { ssh: ssh_session, probability: probability, for_reals: true }
       }
