@@ -3,30 +3,35 @@ require_relative "./version"
 
 module LeeroyJenkins
   class CommandLineRunner
-    # TODO: this should really:
-    # 1) search for any valid commands
-    # 2) then run individual option parsers per disruption
-    #    but since I haven't setup how to run stress on boxes network is the
-    #    only disruption type atm
-    # 3) A lot of what exists in here should belong in Network's command line
-    #    parser
-
-    VALID_COMMANDS = %w{
-      network
-      fire_drill
+    VALID_COMMANDS = {
+      network: LeeroyJenkins::Disruption::Network,
+      # fire_drill: LeeroyJenkins::FireDrill
     }
 
     VERSION_FLAG = "--version"
 
-    def run
-      if ARGV.any? { |arg| arg == VERSION_FLAG }
-        Logger.info(VERSION)
+    def self.run(arguments)
+      if arguments.any? { |arg| arg == VERSION_FLAG }
+        Logger.info("Version: #{VERSION}")
       else
-        ARGV.find { |arg| VALID_COMMANDS.include?(arg) }.tap do |command|
-          CommandLineArgumentParser.print_help if command.nil?
-        end
+        arguments
+          .find { |arg| VALID_COMMANDS.keys.include?(arg.to_sym) }
+          .tap do |command|
+            return print_help if command.nil?
+
+            VALID_COMMANDS[command.to_sym].run_with(arguments)
+          end
       end
     end
 
+    def self.print_help
+      # TODO print something meaningful woot!
+      Logger.info("TODO write help shit")
+      quit_program(1)
+    end
+
+    def self.quit_program(code)
+      exit(code)
+    end
   end
 end

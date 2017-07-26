@@ -38,11 +38,11 @@ module LeeroyJenkins
               it "will contain two rules with probability" do
                 is_expected.to contain_exactly(
                   "sudo iptables -A OUTPUT --destination #{dependency} " \
-                  "-m statistic --mode random --probability #{probability} " \
-                  "-j DROP",
+                    "-m statistic --mode random --probability #{probability} " \
+                    "-j DROP",
                   "sudo iptables -A OUTPUT --destination #{dependency_2} " \
-                  "-m statistic --mode random --probability #{probability} " \
-                  "-j DROP"
+                    "-m statistic --mode random --probability #{probability} " \
+                    "-j DROP"
                 )
               end
             end

@@ -2,19 +2,17 @@ require_relative "./env"
 
 module LeeroyJenkins
   class Logger
-    NAME = "LJ"
-
     class << self
       def warn(message)
-        write("[\e[33m#{NAME} WARN\e[0m]", message)
+        write("[\e[33mWARN\e[0m]", message)
       end
 
       def error(message)
-        write("[\e[31m#{NAME} ERROR\e[0m]", message)
+        write("[\e[31mERROR\e[0m]", message)
       end
 
       def info(message)
-        write("[\e[36m#{NAME} INFO\e[0m]", message)
+        write("[\e[36mINFO\e[0m]", message)
       end
 
       def write(header, message)

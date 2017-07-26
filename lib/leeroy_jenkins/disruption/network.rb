@@ -1,7 +1,8 @@
-require_relative "../logger.rb"
-require_relative "../victim.rb"
-require_relative "../ssh_session.rb"
-require_relative "./network/build_rule.rb"
+require_relative "../logger"
+require_relative "../victim"
+require_relative "../ssh_session"
+require_relative "./network/build_rule"
+require_relative "./network/command_line_parser"
 
 require "net/ssh"
 
@@ -25,9 +26,10 @@ module LeeroyJenkins
 
       attr_accessor :victim, :duration, :half_open, :for_reals, :ssh
 
-      def self.run_from_command_line(arguments)
-        parser = CommandLineParser.new(arguments)
-        new(victim, parser.options)
+      def self.run_with(arguments)
+        options = CommandLineParser.new(arguments).options
+        victim = Victim.new(options)
+        new(victim, options).run!
       end
 
       def initialize(victim, options = {})
