@@ -1,7 +1,7 @@
 # I want to run n disruptions within x hours
 
 module LeeroyJenkins
-  class OnCallFireDrill
+  class FireDrill
     attr_accessor :disruptions, :duration, :half_open, :for_reals, :probability
 
     def initialize(options = {})
