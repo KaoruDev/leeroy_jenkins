@@ -1,5 +1,4 @@
 require_relative "../../spec_helper"
-require "spec/factories/ssh_session"
 
 require "lib/leeroy_jenkins/disruption/network"
 
@@ -38,7 +37,7 @@ module LeeroyJenkins
         end
       end
 
-      describe ".run!" do
+      describe ".start" do
         let(:commands) {
           [
             "sudo iptables-save > ~/default_iptables.rules",
@@ -74,7 +73,7 @@ module LeeroyJenkins
             }
 
             network = Network.new(victim, network_configs)
-            network.run!
+            network.start
 
             # Order of commands matter
             expect(expected_commands).to eq(received_commands)
@@ -121,7 +120,7 @@ module LeeroyJenkins
             }.once
 
             network = Network.new(victim, network_configs)
-            network.run!
+            network.start
 
             # Order of commands matter
             expect(expected_commands).to eq(received_commands)
@@ -158,7 +157,7 @@ module LeeroyJenkins
               { half_open: true }.merge(network_configs)
             )
 
-            network.run!
+            network.start
 
             # Order of commands matter
             expect(expected_commands).to eq(received_commands)

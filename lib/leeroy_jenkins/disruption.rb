@@ -1,4 +1,4 @@
-require_relative "./disruptions/network.rb"
+require_relative "./disruption/network"
 
 module LeeroyJenkins
   class Disruption

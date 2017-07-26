@@ -29,13 +29,10 @@ module LeeroyJenkins
       def self.run_with(arguments)
         options = CommandLineParser.new(arguments).options
         victim = Victim.new(options)
-        new(victim, options).run!
+        new(victim, options).start
       end
 
       def initialize(victim, options = {})
-        # TODO: I should change how we use options, it's easier to read if i
-        # destruct it in initialize instead of all over the place
-
         @ssh = options[:ssh]
         @probability = options[:probability]
         @half_open = options[:half_open] || false
@@ -44,7 +41,7 @@ module LeeroyJenkins
         @for_reals = options[:for_reals]
       end
 
-      def run!
+      def start
         commands = [
           "sudo iptables-save > ~/#{DEFAULT_RULES_FILE}",
           "echo '#{reset_rules_command}' | at now + #{duration} minutes",

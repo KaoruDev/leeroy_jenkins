@@ -1,30 +1,44 @@
+require "timeout"
+require_relative "./disruption"
 # I want to run n disruptions within x hours
 
 module LeeroyJenkins
   class FireDrill
-    attr_accessor :disruptions, :duration, :half_open, :for_reals, :probability
+    attr_accessor :disruptions,
+      :duration,
+      :for_reals,
+      :disruption_limit,
+      :start_time
+    # leeroy fire_drill --topology=topology.yml --duration=6 --disruptions=10
+
+    DEFAULT_DISRUPTIONS = 5
+    DEFAULT_DURATION_HOURS = 6
+
+    def self.run_with(_arguments)
+      # options = CommandLineParser.new(arguments).options
+      # new(options).start
+    end
 
     def initialize(options = {})
       @disruptions = []
-      @options = options
-      @number_of_disruptions = options[:number_of_disruptions]
-      @probability = options[:probability]
       @for_reals = options[:for_reals]
-      @duration = options[:duration]
+      @disruption_limit = options[:disruption_limit] || DEFAULT_DISRUPTIONS
+      @duration = options[:duration] || DEFAULT_DURATION_HOURS
     end
 
     def start
-      loop do
-        run_iteration
+      @start_time = now
+      Timeout.timeout(duration_in_seconds) do # fail safe
+        run_iteration while running?
       end
     ensure
-      close!
+      disruptions.each(&:close)
     end
 
     def run_iteration
       if time_to_disrupt
         select_disruption.tap do |next_disrupton|
-          next_disrupton.run!
+          next_disrupton.start
           disruptions << next_disrupton
         end
       end
@@ -35,30 +49,32 @@ module LeeroyJenkins
     def select_disruption
       Disruption.select_random.new(
         victim,
-        ssh: ssh,
-        probability: probability,
-        half_open: half_open,
-        duration: duration,
         for_reals: for_reals
       )
     end
 
-    def close!
-      disruptions.each(&:close!)
+    private
+
+    def victim
+      # TODO(Kaoru) this is where topology comes into play
+      Victim.new(target: "example.com")
     end
 
-    private
+    def running?
+      disruptions.count < disruption_limit &&
+        start_time + duration_in_seconds > now
+    end
 
     def time_to_disrupt
       rand < 0.01 # 1% chance
     end
 
-    def victim
-      # topology randomly choose victim
+    def duration_in_seconds
+      duration * 60 * 60
     end
 
-    def ssh
-      SshSession.new(victim, for_reals: for_reals)
+    def now
+      Time.now.to_i
     end
 
     def pause

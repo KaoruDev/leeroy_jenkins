@@ -11,4 +11,3 @@ RSpec.configure do |config|
     LeeroyJenkins::Logger.instance_variable_set("@test_log", [])
   end
 end
-
