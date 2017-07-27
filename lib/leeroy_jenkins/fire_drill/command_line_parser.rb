@@ -42,7 +42,7 @@ module LeeroyJenkins
             "number of hours from now in which disruptions can " \
               "occur, default is #{DEFAULT_DURATION_HOURS}"
           ) do |duration|
-            configuration[:duration] = duration
+            configuration[:duration] = duration.to_i
           end
         end
       end
