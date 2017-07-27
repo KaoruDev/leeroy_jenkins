@@ -55,6 +55,9 @@ module LeeroyJenkins
     end
 
     def load_yaml_file
+      if file_path.nil?
+        raise Error, "Please provide a path to your topology file"
+      end
       Psych.safe_load(File.read(file_path))
     rescue Psych::SyntaxError => e
       Logger.error("Unable to parse #{file_path}")

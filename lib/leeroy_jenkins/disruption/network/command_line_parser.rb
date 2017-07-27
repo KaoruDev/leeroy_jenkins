@@ -1,5 +1,6 @@
 require_relative "../../logger"
 require_relative "../network"
+require_relative "../../utils"
 require_relative "../../utils/common_command_line_parser"
 
 module LeeroyJenkins
@@ -24,6 +25,21 @@ module LeeroyJenkins
             opts.banner = banner
 
             opts.on(
+              "-t target",
+              "--target=SERVER_URL",
+              "URL or ip address of the box where disruptions will be created"
+            ) do |target|
+              configuration[:target] = target
+            end
+
+            opts.on(
+              "--dependencies=DEPENDENCIES",
+              "Coma seperate list of network dependencies"
+            ) do |dependencies|
+              configuration[:dependencies] = dependencies.split(",")
+            end
+
+            opts.on(
               "--half_open",
               "Simulates half open networks"
             ) do |half_open|
@@ -44,21 +60,6 @@ module LeeroyJenkins
 
               configuration[:probability] = probability.to_f
             end
-
-            opts.on(
-              "-t target",
-              "--target=SERVER_URL",
-              "URL or ip address of the box where disruptions will be created"
-            ) do |target|
-              configuration[:target] = target
-            end
-
-            opts.on(
-              "--dependencies=DEPENDENCIES",
-              "Coma seperate list of network dependencies"
-            ) do |dependencies|
-              configuration[:dependencies] = dependencies.split(",")
-            end
           end
         end
         # rubocop:enable Metrics/BlockLength
@@ -72,8 +73,9 @@ Causing havoc on your Topology!
 
 I'll configure packets to be dropped on a target box by setting
 up iptables rules. Don't worry I'll clean up after myself based on the duration
-you configure or the default of #{Network::DEFAULT_DURATION} minutes. You can
-manually reset your rules by running `#{Network::RESET_RULES_COMMAND}`
+you configure or the default of #{Network::DEFAULT_RESET_IN}
+minutes. You can manually reset your rules by running
+`#{Network::RESET_RULES_COMMAND}`
 
 Usage: leeroy network [options] -t example.com
           }

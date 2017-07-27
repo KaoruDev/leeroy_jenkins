@@ -20,11 +20,11 @@ module LeeroyJenkins
   class Disruption
     class Network
       DEFAULT_RULES_FILE = "default_iptables.rules"
-      DEFAULT_DURATION = 60
+      DEFAULT_RESET_IN = 60
       RESET_RULES_COMMAND =
         "cat ~/#{DEFAULT_RULES_FILE} | sudo iptables-restore"
 
-      attr_accessor :victim, :duration, :half_open, :for_reals, :ssh
+      attr_accessor :victim, :reset_in, :half_open, :for_reals, :ssh
 
       def self.run_with(arguments)
         options = CommandLineParser.new(arguments).options
@@ -36,7 +36,8 @@ module LeeroyJenkins
         @ssh = options[:ssh]
         @probability = options[:probability]
         @half_open = options[:half_open] || false
-        @duration = options[:duration] || DEFAULT_DURATION
+        @reset_in = options[:reset_in] ||
+          DEFAULT_RESET_IN
         @victim = victim
         @for_reals = options[:for_reals]
       end
@@ -44,9 +45,10 @@ module LeeroyJenkins
       def start
         commands = [
           "sudo iptables-save > ~/#{DEFAULT_RULES_FILE}",
-          "echo '#{reset_rules_command}' | at now + #{duration} minutes",
+          "echo '#{reset_rules_command}' | " \
+            "at now + #{reset_in} minutes",
           "echo 'rm ~/#{DEFAULT_RULES_FILE}' | " \
-            "at now + #{duration + 1} minutes",
+            "at now + #{reset_in + 1} minutes",
           "sudo iptables -A INPUT -p 22 -j ACCEPT",
           "sudo iptables -A OUTPUT --sport 22 -j ACCEPT",
         ]

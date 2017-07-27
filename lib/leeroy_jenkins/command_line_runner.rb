@@ -1,12 +1,14 @@
 require_relative "./disruption/network"
+require_relative "./fire_drill"
 require_relative "./version"
-require_relative "./error"
+require_relative "./errors"
+require_relative "./utils"
 
 module LeeroyJenkins
   class CommandLineRunner
     VALID_COMMANDS = {
       network: LeeroyJenkins::Disruption::Network,
-      # fire_drill: LeeroyJenkins::FireDrill
+      fire_drill: LeeroyJenkins::FireDrill
     }
 
     VERSION_FLAG = "--version"
@@ -26,17 +28,13 @@ module LeeroyJenkins
     rescue Error => e
       Logger.error(e)
       Logger.error(e.backtrace.join("\n"))
-      quit_program(1)
+      Utils.quit_program(1)
     end
 
     def self.print_help
       # TODO print something meaningful woot!
       Logger.info("TODO write help shit")
-      quit_program(1)
-    end
-
-    def self.quit_program(code)
-      exit(code)
+      Utils.quit_program(1)
     end
   end
 end

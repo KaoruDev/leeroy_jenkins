@@ -1,9 +1,10 @@
-require_relative "../logger"
-
 require "optparse"
 
+require_relative "../logger"
+require_relative "../utils"
+
 module LeeroyJenkins
-  module Utils
+  class Utils
     class CommonCommandLineParser
       attr_reader :configuration, :arguments
 
@@ -19,10 +20,10 @@ module LeeroyJenkins
 
         parser.parse!(arguments)
         configuration
-      rescue OptionParser::InvalidOption
-        Logger.warn("Opps I'm not sure how to parse that option")
+      rescue OptionParser::InvalidOption => e
+        Logger.warn("Opps I'm not sure how to parse option: #{e}")
         Logger.info(parser.help)
-        quit_program(1)
+        Utils.quit_program(1)
       end
 
       private
@@ -30,10 +31,10 @@ module LeeroyJenkins
       def configure
         OptionParser.new do |opts|
           opts.on(
-            "--version",
-            "Display the version of Leeroy Jenkins"
-          ) do
-            configuration[:display_version] = true
+            "--reset_in=MINUTES",
+            "Number of minutes the disruption will automatically reset"
+          ) do |reset_in|
+            configuration[:reset_in] = reset_in.to_i
           end
 
           opts.on(
@@ -44,19 +45,14 @@ module LeeroyJenkins
           end
 
           opts.on(
-            "--duration=DURATION",
-            "How long before the rules are reset"
-          ) do |duration|
-            configuration[:duration] = duration.to_i
+            "--version",
+            "Display the version of Leeroy Jenkins"
+          ) do
+            configuration[:display_version] = true
           end
 
           yield(opts, configuration)
         end
-      end
-
-      # Mostly here so we can stub in specs
-      def quit_program(code)
-        exit(code)
       end
     end
   end

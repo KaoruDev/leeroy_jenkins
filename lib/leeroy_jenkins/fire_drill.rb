@@ -1,22 +1,24 @@
 require "timeout"
 require_relative "./disruption"
-# I want to run n disruptions within x hours
+require_relative "./fire_drill/command_line_parser"
+require_relative "./topology"
 
 module LeeroyJenkins
   class FireDrill
     attr_accessor :disruptions,
       :duration,
+      :reset_in,
       :for_reals,
       :disruption_limit,
-      :start_time
-    # leeroy fire_drill --topology=topology.yml --duration=6 --disruptions=10
+      :start_time,
+      :topology_file_path
 
     DEFAULT_DISRUPTIONS = 5
     DEFAULT_DURATION_HOURS = 6
 
-    def self.run_with(_arguments)
-      # options = CommandLineParser.new(arguments).options
-      # new(options).start
+    def self.run_with(arguments)
+      options = CommandLineParser.new(arguments).options
+      new(options).start
     end
 
     def initialize(options = {})
@@ -24,6 +26,8 @@ module LeeroyJenkins
       @for_reals = options[:for_reals]
       @disruption_limit = options[:disruption_limit] || DEFAULT_DISRUPTIONS
       @duration = options[:duration] || DEFAULT_DURATION_HOURS
+      @topology_file_path = options[:topology_file_path]
+      @reset_in = options[:reset_in]
     end
 
     def start
@@ -49,15 +53,19 @@ module LeeroyJenkins
     def select_disruption
       Disruption.select_random.new(
         victim,
-        for_reals: for_reals
+        for_reals: for_reals,
+        reset_in: reset_in
       )
     end
 
     private
 
     def victim
-      # TODO(Kaoru) this is where topology comes into play
-      Victim.new(target: "example.com")
+      topology.choose_random_victim
+    end
+
+    def topology
+      @topology ||= Topology.new(topology_file_path)
     end
 
     def running?
@@ -78,7 +86,7 @@ module LeeroyJenkins
     end
 
     def pause
-      sleep 60
+      #sleep 60
     end
   end
 end

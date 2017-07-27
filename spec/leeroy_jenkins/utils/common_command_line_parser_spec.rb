@@ -4,25 +4,25 @@ require "lib/leeroy_jenkins/logger"
 require "lib/leeroy_jenkins/utils/common_command_line_parser"
 
 module LeeroyJenkins
-  module Utils
+  class Utils
     RSpec.describe CommonCommandLineParser do
       describe "#parse" do
         it "will convert arguments into a hash" do
           parser = CommonCommandLineParser.new(%w{
-            --duration=5
+            --reset_in=5
             --for_reals
           })
 
-          expect(parser.parse).to eq(duration: 5, for_reals: true)
+          expect(parser.parse).to eq(reset_in: 5, for_reals: true)
         end
 
         it "will exit the program if an invalid argument is passed" do
           parser = CommonCommandLineParser.new(%w{
-            --duration=5
+            --reset_in=5
             --foobar
           })
 
-          expect(parser).to receive(:quit_program).with(1)
+          expect(Utils).to receive(:quit_program).with(1)
 
           parser.parse
 
@@ -32,7 +32,7 @@ module LeeroyJenkins
         context "when block is given" do
           it "will allow client to add custom options" do
             parser = CommonCommandLineParser.new(%w{
-              --duration=5
+              --reset_in=5
               --foobar=YOLO
             })
 
@@ -42,7 +42,7 @@ module LeeroyJenkins
               end
             end
 
-            expect(configs).to eq(duration: 5, foobar: "YOLO")
+            expect(configs).to eq(reset_in: 5, foobar: "YOLO")
           end
         end
       end

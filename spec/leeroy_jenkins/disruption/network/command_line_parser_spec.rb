@@ -12,7 +12,7 @@ module LeeroyJenkins
             parser = CommandLineParser.new(%w{
               --target=example.com
               --dependencies=foo.example.com,bar.example.com
-              --duration=5
+              --reset_in=5
               --half_open
               --probability=0.8
             })
@@ -20,7 +20,7 @@ module LeeroyJenkins
             expect(parser.options).to eq(
               target: "example.com",
               dependencies: %w{foo.example.com bar.example.com},
-              duration: 5,
+              reset_in: 5,
               half_open: true,
               probability: 0.8
             )
@@ -35,7 +35,7 @@ module LeeroyJenkins
             parser = CommandLineParser.new(arguments)
             common_parser = Utils::CommonCommandLineParser.new(arguments)
 
-            expect(common_parser).to receive(:quit_program).with(1)
+            expect(Utils).to receive(:quit_program).with(1)
             expect(parser).to receive(:common_parser).and_return(common_parser)
 
             parser.options
