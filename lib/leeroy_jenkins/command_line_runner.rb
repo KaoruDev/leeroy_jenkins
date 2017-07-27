@@ -1,5 +1,6 @@
 require_relative "./disruption/network"
 require_relative "./version"
+require_relative "./error"
 
 module LeeroyJenkins
   class CommandLineRunner
@@ -22,6 +23,10 @@ module LeeroyJenkins
             VALID_COMMANDS[command.to_sym].run_with(arguments)
           end
       end
+    rescue Error => e
+      Logger.error(e)
+      Logger.error(e.backtrace.join("\n"))
+      quit_program(1)
     end
 
     def self.print_help
