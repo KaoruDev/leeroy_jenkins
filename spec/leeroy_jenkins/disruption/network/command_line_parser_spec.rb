@@ -33,10 +33,8 @@ module LeeroyJenkins
             }
 
             parser = CommandLineParser.new(arguments)
-            common_parser = Utils::CommonCommandLineParser.new(arguments)
 
             expect(Utils).to receive(:quit_program).with(1)
-            expect(parser).to receive(:common_parser).and_return(common_parser)
 
             parser.options
           end
