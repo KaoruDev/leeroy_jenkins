@@ -12,7 +12,7 @@ Lint/AssignmentInCondition:
   Enabled: false
 
 Lint/EndAlignment:
-  AlignWith: variable
+  EnforcedStyleAlignWith: variable
 
 Lint/HandleExceptions:
   Enabled: false
@@ -22,15 +22,22 @@ Lint/HandleExceptions:
 Metrics/AbcSize:
   Enabled: false
 
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*'
+    - 'bin/*'
+
 Metrics/ClassLength:
   Enabled: false
 
 Metrics/MethodLength:
   Enabled: false
 
+
 Metrics/ModuleLength:
   Exclude:
     - 'spec/**/*'
+    - 'bin/*'
 
 ########################## Styles ################################
 
@@ -68,6 +75,9 @@ Style/EmptyLinesAroundMethodBody:
   Enabled: false
 
 Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/GuardClause:
   Enabled: false
 
 Style/IfUnlessModifier:

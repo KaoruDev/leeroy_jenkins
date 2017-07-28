@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require_relative "../lib/leeroy_jenkins/command_line_runner"
+
+LeeroyJenkins::CommandLineRunner.run(ARGV)

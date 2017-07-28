@@ -1,0 +1,9 @@
+nodes:
+  web:
+    uri: "web.example.com"
+    dependencies:
+      - "api"
+      - "db.example.com"
+  api:
+    uri: "api.example.com"
+
