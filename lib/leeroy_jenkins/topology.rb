@@ -1,4 +1,4 @@
-require "Psych"
+require "psych"
 
 require_relative "./victim"
 require_relative "./errors"
