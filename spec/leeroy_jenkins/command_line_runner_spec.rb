@@ -1,3 +1,5 @@
+require "timeout"
+
 require_relative "../spec_helper"
 
 require "lib/leeroy_jenkins/version"
@@ -68,6 +70,32 @@ module LeeroyJenkins
           end
 
           expect(expected_commands.count).to eq(received_commands.count)
+        end
+      end
+
+      context "with fire_drill command" do
+        before do
+          allow_any_instance_of(FireDrill).to receive(:pause)
+        end
+
+        it "will run a fire drill" do
+          allow(Disruption).to receive(:select_random)
+            .and_return(Disruption::Network)
+
+          Timeout.timeout(0.5) do
+            CommandLineRunner.run(%w{
+              fire_drill
+              --disruption_limit=1
+              --topology=spec/helpers/test_network_topology.yml
+            })
+          end
+
+          expect(Logger.test_log.count).to be > 0
+          iptable_log = Logger.test_log.find do |log|
+            log.match(/sudo iptables/)
+          end
+
+          expect(iptable_log).not_to be_nil
         end
       end
     end

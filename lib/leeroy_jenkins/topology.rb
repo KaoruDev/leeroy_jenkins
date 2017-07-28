@@ -71,7 +71,7 @@ module LeeroyJenkins
       end
 
       nodes.each do |name, node|
-        if node["uri"].nil? || node["uri"] == ""
+        if !node.is_a?(Hash) || node["uri"].nil? || node["uri"] == ""
           raise Error, "Please make sure node #{name} has a uri"
         end
       end

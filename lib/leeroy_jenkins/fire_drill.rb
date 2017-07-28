@@ -32,7 +32,9 @@ module LeeroyJenkins
 
     def start
       @start_time = now
-      Timeout.timeout(duration_in_seconds) do # fail safe
+      # Timeout is used just in case we get stuck in an infinite loop due to a
+      # bug or something
+      Timeout.timeout(duration_in_seconds) do
         run_iteration while running?
       end
     ensure
@@ -86,7 +88,7 @@ module LeeroyJenkins
     end
 
     def pause
-      #sleep 60
+      sleep 60 if for_reals
     end
   end
 end
