@@ -24,4 +24,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rspec", "~> 3.5"
   s.add_development_dependency "rubocop", "~> 0.48"
   s.add_development_dependency "fabrication", "~> 2.15"
+  s.add_development_dependency "rspec_junit_formatter", "~> 0.3"
 end
